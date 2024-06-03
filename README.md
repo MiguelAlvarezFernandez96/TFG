@@ -1,4 +1,4 @@
-# API REST for the Drone Engineering Ecosystem
+# Mongo DB Service for the Drone Engineering Ecosystem
 
 ## Table of Contents
 1. [Introduction](#introduction)
