@@ -34,5 +34,7 @@ To make it easier to work with the database, it is also recommended to install [
 To run and contribute, clone this repository to your local machine and install the requirements.  
 
 pip install -r requirements.txt
+
+
 C:\Program Files\MongoDB\Server\7.0\bin\mongod.conf
     
