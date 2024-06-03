@@ -32,4 +32,7 @@ To make it easier to work with the database, it is also recommended to install [
 ## Local set up
 
 To run and contribute, clone this repository to your local machine and install the requirements.  
+
+
+C:\Program Files\MongoDB\Server\7.0\bin\mongod.conf
     
