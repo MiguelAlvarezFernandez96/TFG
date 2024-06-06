@@ -33,6 +33,8 @@
 <script>
 import {ref, onMounted, inject } from 'vue'
 import leaflet from 'leaflet'
+import L from 'leaflet';
+
 import Swal from 'sweetalert2'
 import * as turf from '@turf/turf';
 import ScenariosControllers from './ScenariosControllers.vue';
@@ -193,7 +195,7 @@ export default {
                 scenariosShowing.value = true;
                 showTitle.value = true;
                 buttonsDisabled.value = false;
-                client.publish('mongo/mobileApp/getPoligonos')
+                client.publish('dashboardControllers/mongo/getPoligonos')
                 selectScenarioButtonDisabled.value = false;
                 createScenarioButtonDisabled.value = false;
             })
@@ -208,7 +210,7 @@ export default {
             client.subscribe("mobileApp/dashboardControllers/direction");
             client.subscribe("mobileApp/dashboardControllers/drop");
             client.subscribe("autopilotService/mobileApp/telemetryInfo");
-            client.subscribe("mobileApp/mongo/readPoligonos");
+            client.subscribe("mongo/dashboardControllers/readPoligonos");
             
             client.on('message', (topic, message) => {
                 console.log(topic)
@@ -268,7 +270,7 @@ export default {
                     selectScenarioButtonDisabled.value = true;
                     createScenarioButtonDisabled.value = true;
                 }
-                else if(topic == "mobileApp/mongo/readPoligonos")
+                else if(topic == "mongo/dashboardControllers/readPoligonos")
                 {
                     console.log('Poligonos Cargando')
                     PoligonosNuevos =JSON.parse (message)
@@ -481,7 +483,6 @@ function CrearListaEscenarios(PoligonosNuevos){
             waypointsCoord = [];
             actualPlayerPolygon = [];
             playersPolygonsCoord = [];
-            createScenario.value = false;
             selectScenarioButtonDisabled.value = false;
             createScenarioButtonDisabled.value = false;
             buttonFinishDisabled.value = true;
@@ -562,59 +563,6 @@ function CrearListaEscenarios(PoligonosNuevos){
         return Escenario;
     }
 
-    function ScenariosUpdate3 (){
-        fetch("../../assets/ControllersAssetsV2/2players/Coordenadas 26_2_2024, 7_40_14.txt")
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Error al cargar el archivo');
-    }
-    return response.text();
-  })
-  .then(texto => {
-    console.log('Contenido del archivo:', texto);
-  })
-    }
-    function ScenariosUpdate2 (){
-            let folderPath = "";
-            if (numPlayers.value ==2){
-                 folderPath = "../../assets/ControllersAssetsV2/2players";
-            }
-            if (numPlayers.value==3){
-                 folderPath = "../../assets/ControllersAssetsV2/3players";
-            }
-            if (numPlayers.value==4){
-                 folderPath = "../../assets/ControllersAssetsV2/4players";
-            }
-            console.log(folderPath);
-                    let file ="../../assets/ControllersAssetsV2/2players/Coordenadas 26_2_2024, 7_40_14.txt";
-                    
-                    fetch(file)
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.text(); // Devuelve el contenido del archivo como texto
-})
-  .then(data => {
-    console.log(`Contenido de ${file}:`);
-                        if (numPlayers.value == 2){
-                            scenario2vector.push(ReadScenario(data)) ;
-                        }
-                        if (numPlayers.value == 3){
-                            scenario3vector.push(ReadScenario(data));
-                        }
-                        if (numPlayers.value == 4){
-                            scenario4vector.push(ReadScenario(data));
-                        } // Hacer algo con el contenido del archivo de texto
-  })
-    
-        // Hacer algo con el contenido del archivo, por ejemplo, imprimirlo
- 
-                        // file.png
-                      
-                    }           
-               
-            
         
     
         function ScenariosUpdate (){
@@ -664,38 +612,6 @@ function CrearListaEscenarios(PoligonosNuevos){
                     }           
                 });console.log('Paso2');
             });
-        }
-    
-        function nextPlayer(){
-
-            actualPlayer.value = actualPlayer.value + 1;            
-            playersPolygonsCoord.push(actualPlayerPolygon);
-            nextPlayerDisabled.value = true;            
-            if(actualPlayer.value == numPlayers.value-1){
-                actualPlayerPolygon = [droneLabLimits];                
-                for(let i = 0; i<numPlayers.value-1; i++){                                
-                    for(let j = 0; j<playersPolygonsCoord[i].length ; j++){
-                        actualPlayerPolygon.push(playersPolygonsCoord[i][j])    
-                    }
-                }
-                playersPolygonsCoord.push(actualPlayerPolygon);
-                playersPolygons.push(leaflet.polygon(playersPolygonsCoord[numPlayers.value-1], {color: playerColors[actualPlayer.value]}).addTo(map));
-                for(let i = 0; i<numPlayers.value-1; i++){
-                    playersPolygons.push(leaflet.polygon(playersPolygonsCoord[i], {color: playerColors[i]}).addTo(map));
-                }
-                finalBasePolygon.remove(map);
-                leaflet.polygon(finalBase, {color: '#D301F9', fillColor: '#D301F9', fillOpacity: 0.5}).addTo(map);               
-                buttonFinishDisabled.value = false;
-                Swal.fire('Sector set for player: '+players.value[actualPlayer.value]); 
-                addingObstacleSector = true;  
-            }
-            else{
-                Swal.fire('Set sectors for player: '+players.value[actualPlayer.value]);   
-            }              
-
-            actualPlayerPolygon = [];
-            
-            
         }
 
         function save(){
@@ -756,34 +672,24 @@ function CrearListaEscenarios(PoligonosNuevos){
             return JSON.stringify(sectorJSON)
         }
 
-        function selectScenario(){
-           ScenariosUpdate3();
-            console.log(scenario2vector);
-            createScenarioButtonDisabled.value = true;
-            scenariosShowing.value = true;
-        }
-
-        function createScenario(){
-            creatingScenario.value = true;
-            selectScenarioButtonDisabled.value = true;
-            Swal.fire('Set sectors for player: '+players.value[actualPlayer.value]);
-           
-        }
         
 
         function paintScenario(){
             if(numPlayers.value == 4){
                 playersPolygonsCoord = Array.from(scenario4vector[scenario].PoligonosJugadores);
+                ObstaclesPolygonsCoord = Array.from(scenario4vector[scenario].Obstaculos)
             }
             else if(numPlayers.value == 3){
                 playersPolygonsCoord = Array.from(scenario3vector[scenario].PoligonosJugadores)
+                ObstaclesPolygonsCoord = Array.from(scenario3vector[scenario].Obstaculos)
             }
             else if(numPlayers.value == 2){
                 playersPolygonsCoord = Array.from(scenario2vector[scenario].PoligonosJugadores)
                 ObstaclesPolygonsCoord = Array.from(scenario2vector[scenario].Obstaculos)
             }
-        
-            for(let i = 0; i<numPlayers.value; i++){
+            playersPolygons.push(L.polygon(playersPolygonsCoord[numPlayers.value-1], {color: playerColors[numPlayers.value-1]}).addTo(map));
+            
+            for(let i = 0; i<numPlayers.value-1; i++){
                 playersPolygons.push(leaflet.polygon(playersPolygonsCoord[i], {color: playerColors[i]}).addTo(map));
             } 
             ObstaclesPolygons.push(leaflet.polygon(ObstaclesPolygonsCoord, {color: obstaclesColors}).addTo(map));
@@ -810,6 +716,8 @@ function CrearListaEscenarios(PoligonosNuevos){
             }            
             return inside;
         }
+
+
 
         function polygonsIntersect(){
             let intersecting = false;
@@ -1034,16 +942,11 @@ function CrearListaEscenarios(PoligonosNuevos){
             actualPlayer,
             showTitle,/////**
             buttonsDisabled,
-            nextPlayer,
-            nextPlayerDisabled,
             addObstacle,
             ScenariosUpdate,
-            ScenariosUpdate2,
             gotocreatormode,
             addObstacleDisabled,
             buttonFinishDisabled,
-            selectScenario,
-            createScenario,
             selectScenarioButtonDisabled,
             createScenarioButtonDisabled,
             scenariosShowing,

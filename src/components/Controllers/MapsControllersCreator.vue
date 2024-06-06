@@ -40,6 +40,8 @@
 <script>
 import {ref, onMounted, inject } from 'vue'
 import leaflet from 'leaflet'
+import L from 'leaflet';
+
 import Swal from 'sweetalert2'
 import * as turf from '@turf/turf';
 import ScenariosControllers from './ScenariosControllers.vue'
@@ -199,7 +201,7 @@ export default {
             emitter.on('playersControllers', (data) => {
                 players.value = data.players;
                 numPlayers.value = players.value.length;
-                client.publish('mongo/mobileApp/getPoligonos')
+                client.publish('dashboardControllers/mongo/getPoligonos')
                 showTitle.value = true;
                 buttonsDisabled.value = false;
                 selectScenarioButtonDisabled.value = false;
@@ -210,23 +212,23 @@ export default {
                 scenario = data.scenario
                 
                 if (numPlayers.value == 2){
-                    client.publish('mongo/mobileApp/deletePoligonos',JSON.stringify(scenario2vector[scenario]))
+                    client.publish('dashboardControllers/mongo/deletePoligonos',JSON.stringify(scenario2vector[scenario]))
                 }
                 if (numPlayers.value == 3){
-                    client.publish('mongo/mobileApp/deletePoligonos',JSON.stringify(scenario3vector[scenario]))
+                    client.publish('dashboardControllers/mongo/deletePoligonos',JSON.stringify(scenario3vector[scenario]))
                 }
                 if (numPlayers.value == 4){
-                    client.publish('mongo/mobileApp/deletePoligonos',JSON.stringify(scenario4vector[scenario]))
+                    client.publish('dashboardControllers/mongo/deletePoligonos',JSON.stringify(scenario4vector[scenario]))
                 }
                 
-                client.publish('mongo/mobileApp/getPoligonos')
+                client.publish('dashboardControllers/mongo/getPoligonos')
             })
             
             client.subscribe("mobileApp/dashboardControllers/disconnect");
             client.subscribe("mobileApp/dashboardControllers/direction");
             client.subscribe("mobileApp/dashboardControllers/drop");
             client.subscribe("autopilotService/mobileApp/telemetryInfo");
-            client.subscribe("mobileApp/mongo/readPoligonos");
+            client.subscribe("mongo/dashboardControllers/readPoligonos");
 
             
             client.on('message', (topic, message) => {
@@ -286,7 +288,7 @@ export default {
                     selectScenarioButtonDisabled.value = true;
                     createScenarioButtonDisabled.value = true;
                 }
-                else if(topic == "mobileApp/mongo/readPoligonos")
+                else if(topic == "mongo/dashboardControllers/readPoligonos")
                 {
                     console.log('Poligonos Cargando')
                     PoligonosNuevos =JSON.parse (message)
@@ -453,9 +455,11 @@ export default {
                     for(let j = 0; j<playersPolygonsCoord[i].length ; j++){
                         actualPlayerPolygon.push(playersPolygonsCoord[i][j])    
                     }
+                
                 }
+
                 playersPolygonsCoord.push(actualPlayerPolygon);
-                playersPolygons.push(leaflet.polygon(playersPolygonsCoord[numPlayers.value-1], {color: playerColors[actualPlayer.value]}).addTo(map));
+                playersPolygons.push(L.polygon(playersPolygonsCoord[numPlayers.value-1], {color: playerColors[actualPlayer.value]}).addTo(map));
                 for(let i = 0; i<numPlayers.value-1; i++){
                     playersPolygons.push(leaflet.polygon(playersPolygonsCoord[i], {color: playerColors[i]}).addTo(map));
                 }
@@ -483,7 +487,7 @@ export default {
             const fechaActual = new Date();
             let textoFechaHora = fechaActual.toLocaleString();
             textoFechaHora = "Coordenadas " + textoFechaHora;
-            const mapElement = document.getElementById('map'); // Reemplaza 'map' con el id de tu elemento de mapa Leaflet
+            const mapElement = document.getElementById('map'); 
             const captureArea = {
              x: 190,   // Coordenada x del área a capturar
               y: 0,   // Coordenada y del área a capturar
@@ -493,43 +497,12 @@ export default {
             html2canvas(mapElement, {type:'jpeg',quality: 0.1,x: captureArea.x, y: captureArea.y, width: captureArea.width, height: captureArea.height}).then(canvas => {
             const mapImage = canvas.toDataURL('image/jpeg');
             console.log(mapImage)
-            client.publish('mongo/mobileApp/addPoligonos',JSON.stringify({'PoligonosJugadores': playersPolygonsDB,'Obstaculos': ObstaclesPolygonsDB, 'NumeroJugadores': NumPlayersDB, 'Mapa': mapImage}))
+            client.publish('dashboardControllers/mongo/addPoligonos',JSON.stringify({'PoligonosJugadores': playersPolygonsDB,'Obstaculos': ObstaclesPolygonsDB, 'NumeroJugadores': NumPlayersDB, 'Mapa': mapImage}))
             });
             Swal.fire('Scenario saved in database');
            // client.publish('mongo/mobileApp/addPoligonos',JSON.stringify({'PoligonosJugadores': playersPolygonsDB,'Obstaculos': ObstaclesPolygonsDB, 'NumeroJugadores': NumPlayersDB, 'Mapa': mapImage}))
         }
-        function convertirATexto(poligonos) {
-             let texto = '';
 
-              // Iterar sobre cada polígono
-             poligonos.forEach((poligono, index) => {
-            // Extraer las coordenadas (_latlngs) y el color
-                 const coordenadas = JSON.stringify(poligono._latlngs);
-               const color = poligono.options.color;
-               if (index != poligonos.length - 1){
-              texto += `${coordenadas}\n`;
-              texto += `${color}\n`;
-               }
-
-         });
-
-
-          return texto;
-        }
-
-        
-
-        function downloadImage(image){
-            const link = document.createElement('a');
-            link.href = image;
-            const fechaActual = new Date();
-            let textoFechaHora = fechaActual.toLocaleString();
-            textoFechaHora = "Coordenadas " + textoFechaHora;
-            link.download = textoFechaHora+".png";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
         function LoadScenario() {
       // Crear un elemento de entrada de tipo 'file' de forma dinámica
         const input = document.createElement('input');
