@@ -1,20 +1,20 @@
 <template> 
     <h1 style="text-align: center">Dashboard for Controllers Game</h1>
     <div style="display:flex; margin-left:20%"> 
-      <b-button style="width:40%; margin-left:2%; margin-top:5%" @click="ChangeMode('standard')" variant="info" size="lg" :disabled="!CreatorModeActive">Standard Mode</b-button>
-      <b-button style="width:40%; margin-left:2%; margin-top:5%" @click="ChangeMode('Creator')" variant="info" size="lg" :disabled="CreatorModeActive">Creator Mode</b-button>
+      <b-button :class="{ 'disabled-button': !CreatorModeActive }" style="width:40%; margin-left:2%; margin-top:5%" @click="ChangeMode('standard')" variant="info" size="lg" :disabled="!CreatorModeActive">Standard Mode</b-button>
+      <b-button :class="{ 'disabled-button': CreatorModeActive }" style="width:40%; margin-left:2%; margin-top:5%" @click="ChangeMode('Creator')" variant="info" size="lg" :disabled="CreatorModeActive">Creator Mode</b-button>
 </div>
-    <div v-if = "mode=='standard'" class ="main">
-      <TopControllers></TopControllers>
+    <div v-if = "mode=='standard'" :key="mode" class ="main">
+      <TopControllers :mode="mode"></TopControllers>
       <div v-if = "ShowingScenarios==true" class ="main">
         <ScenariosControllers></ScenariosControllers>>
       </div>
-      <MapsControllers></MapsControllers>
+      <MapsControllers :mode="mode"></MapsControllers>
     </div>
-    <div v-if = "mode=='Creator'" class ="main">
-      <TopControllersCreator></TopControllersCreator>
+    <div v-if = "mode=='Creator'" :key="mode" class ="main">
+      <TopControllersCreator :mode="mode"></TopControllersCreator>
       
-      <MapsControllersCreator></MapsControllersCreator>
+      <MapsControllersCreator :mode="mode"></MapsControllersCreator>
     </div>
 
   </template>
@@ -61,6 +61,11 @@
       height: 1000px;    
       margin-left: 5px;
       margin-right: 5px;
+      
+    }
+    .disabled-button {
+      background-color: grey !important; /* Cambia a tu color preferido */
+      color: white; /* Si también quieres cambiar el color del texto */
     }
   
   </style>

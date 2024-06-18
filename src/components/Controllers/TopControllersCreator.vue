@@ -1,4 +1,5 @@
 <template>
+    
     <div class="topStyle">
         <h3 style="text-align: center; margin-top: 2%; margin-bottom: 2%;"> Select players number</h3>
         <div class="row" v-if="maxPlayersChosen" style="text-align: center; margin-top: 5%; margin-bottom: 2%;">
@@ -23,7 +24,8 @@
             </b-input-group-append>
             </b-input-group>
         </div>
-    </div>
+  
+</div>
 </template>
 
 <script>

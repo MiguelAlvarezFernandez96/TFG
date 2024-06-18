@@ -1,5 +1,6 @@
 <template>
-    <div style="margin-top: 2%;">
+    
+    <div style="margin-top: 2%;" :key="componentKey">
         <ScenariosControllers v-if="scenariosShowing" @close="scenariosShowing=false" :numPlayers="numPlayers" :scenario2vector="scenariosMapvector" ></ScenariosControllers>       
         
         <div>
@@ -14,8 +15,9 @@
                 </div>
             </div>  
             <div style="display:flex; margin-left:20%"> 
-                <b-button style="width:20%; margin-left:1%; margin-top:5%" @click="Exportar" variant="info" size="lg" v-if="sectorsButtonsShowing">Exportar</b-button>
+                <b-button style="width:20%; margin-left:1%; margin-top:5%" @click="Exportar" variant="info" size="lg" v-if="sectorsButtonsShowing">Export</b-button>
                 <b-button style="width:20%; margin-left:1%; margin-top:5%" @click="save" variant="success" size="lg" :disabled="buttonFinishDisabled" v-if="sectorsButtonsShowing">Start Practice</b-button>
+                <b-button style="width:20%; margin-left:1%; margin-top:5%" @click="Reset" variant="warning" size="lg"  v-if="sectorsButtonsShowing" >Clear</b-button>
                 <b-button style="width:60%; margin-left:1%; margin-top:5%" @click="finishPractice" variant="danger" size="lg" v-if="finishPracticeButtonShowing">Finish Practice</b-button>
                 <b-button style="width:60%; margin-left:1%; margin-top:5%" @click="startFlying" variant="success" size="lg" v-if="startFlyingButtonShowing">Start Flying</b-button>
                 <b-button style="width:60%; margin-left:1%; margin-top:5%" variant="warning" size="lg" v-if="flying">Flying...</b-button>
@@ -235,7 +237,7 @@ export default {
                             }                        
                         }
                         if(insidePlayer == false){
-                            client.publish("mobileApp/autopilotService/returnToLaunch","");
+                            //client.publish("mobileApp/autopilotService/returnToLaunch","");
                         }
                     }
                     if(telemetryInfo.state == 'onHearth'){
@@ -339,8 +341,8 @@ function CrearListaEscenarios(PoligonosNuevos){
             ShowingScenariosEnable = true;
         }
         function Exportar(){
-            const playersPolygonsDB = playersPolygonsCoord
-            const ObstaclesPolygonsDB = ObstaclesPolygonsCoord
+
+            const DronFence =  [[41.27643580, 1.98821960],[41.27619490, 1.98833760],[41.27636320, 1.98911820],[41.27658190, 1.98901760]];
             console.log(ObstaclesPolygonsCoord[0])
             console.log(ObstaclesPolygonsCoord[0][0])
             console.log(ObstaclesPolygonsCoord[0][0][0])
@@ -362,6 +364,17 @@ function CrearListaEscenarios(PoligonosNuevos){
                 i++;
                 j=0;
             }
+
+            i=0;
+            while (i<DronFence.length){
+                    MissionPlannerDoc = MissionPlannerDoc + k + "\t0\t3\t5001\t4.00000000\t0.00000000\t0.00000000\t0.00000000\t" + DronFence[i][0] + "\t" + DronFence[i][1] + "\t" + j + ".000000\t1\n";
+                    i++;
+                    k++;
+
+
+            }
+            i=0;
+            
             console.log(MissionPlannerDoc);
             var nombreArchivo = "ObstaculosMissionPlanner.waypoints"
        
@@ -613,12 +626,38 @@ function CrearListaEscenarios(PoligonosNuevos){
                 });console.log('Paso2');
             });
         }
-
+        const componentKey = ref(0);
+        function Reset(){
+            count = 0;
+            waypoints.value = [];
+            actualPlayer.value = 0;
+            playersPolygons = [];
+            ObstaclesPolygons =[];            
+            sectorsLines = []; 
+            waypointsCoord = [];
+            actualPlayerPolygon = [];
+            actualObstaclePolygon = [];
+            playersPolygonsCoord = [];
+            ObstaclesPolygonsCoord = [];
+            addingObstacleSector = false;
+            scenariosShowing.value = true;
+            selectScenarioButtonDisabled.value = false;
+            createScenarioButtonDisabled.value = false;
+            buttonFinishDisabled.value = true;
+            console.log("Removing")
+            map.eachLayer((layer) => { //recorre el mapa per anar borrant tot el que hem ficat, pero només si son waypoints o lines
+                if(layer['_latlng']!=undefined) //waypoint
+                    layer.remove();
+                if(layer['_path']!=undefined) //line
+                    layer.remove();
+            });
+            leaflet.polygon(droneLabLimits, {color: 'white'}).addTo(map);
+        }
         function save(){
 
             Swal.fire({
-                title: "Save sectors?",
-                text: "Are you sure? You won't be able to revert this!",
+                title: "Scenario selected",
+                text: "Are you sure you want this scenario?",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
                 confirmButtonText: "Yes!"
@@ -631,7 +670,7 @@ function CrearListaEscenarios(PoligonosNuevos){
                             last = true;
                         }
                         console.log(creatingScenario.value);
-                        let message = sectorToJSON(playersPolygonsCoord[i], i, !creatingScenario.value, last);
+                        let message = sectorToJSON(playersPolygonsCoord[i], i, false, last);
                         console.log(message);
                         client.publish(topic, message);                                           
                     }  
@@ -649,6 +688,7 @@ function CrearListaEscenarios(PoligonosNuevos){
         }
 
         function sectorToJSON(sectorsPlayer, indexColor, predeterminedScenario, last){
+            console.log(sectorsPlayer)
             let waypoint;
             let sectorJSON = {
                 sector: [],
@@ -667,8 +707,9 @@ function CrearListaEscenarios(PoligonosNuevos){
                     sectorArray.push(waypoint);
                 }
                 sectorJSON.sector.push(sectorArray);
+                console.log(sectorJSON)
             }    
-
+            console.log(JSON.stringify(sectorJSON))
             return JSON.stringify(sectorJSON)
         }
 
@@ -963,7 +1004,10 @@ function CrearListaEscenarios(PoligonosNuevos){
             Exportar,
             Testing,
             CrearListaEscenarios,
-            PoligonosNuevos
+            PoligonosNuevos,
+            Reset,
+            componentKey,
+      
             
         }
     },

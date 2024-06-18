@@ -1,5 +1,5 @@
 <template>
-    <div style="margin-top: 2%;">
+    <div style="margin-top: 2%;" >
         <div style="display:flex; margin-left:10%; margin-bottom: 5%;"> 
             <b-button style="width:40%; margin-top:5%" @click="selectScenario" variant="info" size="lg" :disabled="selectScenarioButtonDisabled"><span v-if="scenariosShowing">Cancel</span>
                 <span v-else>Delete Scenario</span></b-button>
@@ -31,17 +31,15 @@
                 <b-button style="width:60%; margin-left:1%; margin-top:5%" variant="info" size="lg" v-if="home">Home</b-button>
             </div>                      
         </div> 
-
-        
     </div>
+   
     
 </template>
 
 <script>
-import {ref, onMounted, inject } from 'vue'
+import {ref, onMounted, inject, onBeforeUnmount } from 'vue'
 import leaflet from 'leaflet'
 import L from 'leaflet';
-
 import Swal from 'sweetalert2'
 import * as turf from '@turf/turf';
 import ScenariosControllers from './ScenariosControllers.vue'
@@ -49,19 +47,25 @@ import ScenariosControllers from './ScenariosControllers.vue'
 import { saveAs } from 'file-saver';
 import html2canvas from 'html2canvas';
 import { toPng } from 'leaflet-image';
-import mode from './ControllersApp.vue';
 
 export default {
     components: {
         ScenariosControllers
         
     },
-    
+    props: {
+    mode: {
+      type: String,
+      required: true
+    }
+  },
+
+
     setup (props, context) {
         
         const emitter = inject('emitter');
         let client = inject('mqttClient');
-        
+        let modo='Creator'
         //Map painting Variables
         let map;
         let popup = leaflet.popup();
@@ -210,25 +214,25 @@ export default {
 
             emitter.on('scenarioSelectedControllers', (data) => {
                 scenario = data.scenario
-                
-                if (numPlayers.value == 2){
+                console.log(modo)
+                if (modo=='Creator')
+                {
+                    if (numPlayers.value == 2){
                     client.publish('dashboardControllers/mongo/deletePoligonos',JSON.stringify(scenario2vector[scenario]))
                 }
                 if (numPlayers.value == 3){
                     client.publish('dashboardControllers/mongo/deletePoligonos',JSON.stringify(scenario3vector[scenario]))
-                }
-                if (numPlayers.value == 4){
-                    client.publish('dashboardControllers/mongo/deletePoligonos',JSON.stringify(scenario4vector[scenario]))
+                    }
+                    if (numPlayers.value == 4){
+                        client.publish('dashboardControllers/mongo/deletePoligonos',JSON.stringify(scenario4vector[scenario]))
+                    }
+                
                 }
                 
                 client.publish('dashboardControllers/mongo/getPoligonos')
             })
             
-            client.subscribe("mobileApp/dashboardControllers/disconnect");
-            client.subscribe("mobileApp/dashboardControllers/direction");
-            client.subscribe("mobileApp/dashboardControllers/drop");
-            client.subscribe("autopilotService/mobileApp/telemetryInfo");
-            client.subscribe("mongo/dashboardControllers/readPoligonos");
+
 
             
             client.on('message', (topic, message) => {
@@ -301,6 +305,17 @@ export default {
                 
             })
         })
+        const cleanup = () => {
+            modo='standard'
+      console.log('Cleaning up MapsControllersCreator');
+        };
+        onBeforeUnmount(() => {
+         cleanup();
+        })
+        
+
+
+
 
         
 
@@ -361,7 +376,7 @@ export default {
                 if(waypoints.value.length>=4){                    
                     if(!polygonsIntersect()){ 
 
-                        if(actualPlayer.value == 0){
+                        if(actualPlayer.value == 0 && !addingObstacleSector){
                             nextPlayerDisabled.value = false;                                    
                         }                         
                         playersPolygons.push(leaflet.polygon(waypoints.value, {color: playerColors[actualPlayer.value]}).addTo(map));                        
@@ -387,6 +402,9 @@ export default {
                       
                          
                     }
+                    else{
+                        nextPlayerDisabled.value = false;  
+                    }
                                         
                     count = 0;
                     waypoints.value = [];
@@ -394,7 +412,7 @@ export default {
                     tmpLine.remove(map);
                     tmpLine = undefined; 
                     sectorsLines = [];  
-                    nextPlayerDisabled.value = false;                   
+                                     
                 }
                 else{
                     Swal.fire("sectors must have at least four points");
@@ -409,10 +427,14 @@ export default {
             waypoints.value = [];
             actualPlayer.value = 0;
             playersPolygons = [];
+            ObstaclesPolygons =[];            
             sectorsLines = []; 
             waypointsCoord = [];
             actualPlayerPolygon = [];
+            actualObstaclePolygon = [];
             playersPolygonsCoord = [];
+            ObstaclesPolygonsCoord = [];
+            addingObstacleSector = false;
             createScenario.value = false;
             selectScenarioButtonDisabled.value = false;
             createScenarioButtonDisabled.value = false;
@@ -932,6 +954,7 @@ export default {
             onMapClick,
             onMapOver,
             onRightClick,
+            cleanup,
             clear,
 
             saveDB,
