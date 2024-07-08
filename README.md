@@ -51,21 +51,25 @@ Have a look to the demo here:
 
 After clicking this game the dashboard for the game is shown. The game have two modes of use, one to play the scenarios and other to create them. The first mode is called standart mode, in here you can see a top component to see the players connected and a map. First of all you must introduce the number of the players and wait until all of them are connected from their mobiles.
 
-<img width="770" alt="Captura de pantalla 2023-07-26 124021" src="https://github.com/MiguelAlvarezFernandez96/TFG/blob/master/assets/Capturas/1.png">
+<img width="500" alt="Captura de pantalla 2024-06-26 124021" src="https://github.com/MiguelAlvarezFernandez96/TFG/blob/master/assets/Capturas/5.png">
 
 Then you would see the scenarios from your MongoDB database with the help of MongoDB Service module. Once the scenario is selected, you can start the practice. In here, the movement of the drone is simulated so the players practice controlling the drone and planning what to do to reach the final base, which will be painted in pink. Also the players will have to avoid the obstacles created.
 
-<img width="357" alt="Captura de pantalla 2023-08-17 131145" src="https://github.com/JoanaOP/DashboardGames/assets/73441184/150de5b3-92a3-4de9-9561-a8cbc4887dc3">
+<img width="357" alt="Captura de pantalla 2023-06-17 131145" src="https://github.com/MiguelAlvarezFernandez96/TFG/blob/master/assets/Capturas/1.png">
 
 Once the practice finishes, you can connect to the Autopilot Service and then arm and take off the drone. From here it will be the players responsability to reach the final base. If you want to land the drone, you can click the "Return Home" button.   
 
 Now for the creators mode, the top component looks the same, but there is no need to wait for players to connect.
 
+<img width="357" alt="Captura de pantalla 2023-06-17 131145" src="https://github.com/MiguelAlvarezFernandez96/TFG/blob/master/assets/Capturas/6.png">
+
 After choosing how many players you want you have two options, to create a new scenario, or to delete one existing. 
 
-If you click on delete button the scenarios will be shown and you can select wich one to delete, if after clicking you don't want to delete one, you can always go back pressing cancel.
+If you click on delete button the scenarios will be shown and you can select which one to delete, if after clicking you don't want to delete one, you can always go back pressing cancel.
 
-When creating a scenario you can draw polygons with left click and paint them with right click, once you finish with all the players you can add obstacles to the scenario, save it in the Mongo Database or to go back with the button clean, which will erase the current scenario allowing to draw again.
+When creating a scenario you can draw polygons with left click and paint them with right click, once you finish with all the players you can add obstacles to the scenario, save it in the Mongo Database or go back with the button clean, which will erase the current scenario allowing to draw again.
+
+<img width="357" alt="Captura de pantalla 2023-06-17 131145" src="https://github.com/MiguelAlvarezFernandez96/TFG/blob/master/assets/Capturas/3.png">
 
 ### Demo
 Have a look to the demo here: 
