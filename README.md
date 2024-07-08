@@ -6,7 +6,7 @@ Dashboard Games is a web app developed with Vue.js that host the dashboards for 
 
 The games included are:
 - **Drone Circus Game**: Allows to control the drone in different ways like using the poses of your body or your fingers to determine the direction. It is a remake of the Drone Circus desktop application and the feature of using the mobile as the camera is added.
-- **Controllers Game**: It is a multiplayer game that allows each player to guide the drone from their mobile. To do this the dronelab is divided in sectors and each sector is assigned to a player. When the drone is in that sector, is the turn of the corresponding player to control it.
+- **Controllers Game**: It is a multiplayer game that allows each player to guide the drone from their mobile. To do this the dronelab is divided in sectors and each sector is assigned to a player. When the drone is in that sector, is the turn of the corresponding player to control it. Also there are obstacles that the dron will avoid. The Controllers Game have two modes, one for playing and other for creating scenarios. The scenarios are saved in a Mongo Database, so it's necessary to use the MongoDB Service to run it properly.
 - **Follow Me Game**: In this game the players are distributed around the dronelab with their respectives mobiles. When it is the player's turn, they say a name of another player to the mobile and the drone moves to the position of that player and takes a photo of them. Then sends it to the rest of the players and it is the turn of the player of whom the picture has been taken.
 
 ## Installation
