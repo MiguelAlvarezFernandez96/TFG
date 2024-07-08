@@ -51,7 +51,7 @@ Have a look to the demo here:
 
 After clicking this game the dashboard for the game is shown. The game have two modes of use, one to play the scenarios and other to create them. The first mode is called standart mode, in here you can see a top component to see the players connected and a map. First of all you must introduce the number of the players and wait until all of them are connected from their mobiles.
 
-<img width="367" alt="Captura de pantalla 2023-08-17 131114" src="https://github.com/JoanaOP/DashboardGames/assets/73441184/1920e432-c1cc-4bca-9b4f-73defb735a5a">
+<img width="770" alt="Captura de pantalla 2023-07-26 124021" src="https://github.com/MiguelAlvarezFernandez96/TFG/master/assets/Captura/Captura de pantalla 2024-06-03 111726">
 
 Then you would see the scenarios from your MongoDB database with the help of MongoDB Service module. Once the scenario is selected, you can start the practice. In here, the movement of the drone is simulated so the players practice controlling the drone and planning what to do to reach the final base, which will be painted in pink. Also the players will have to avoid the obstacles created.
 
