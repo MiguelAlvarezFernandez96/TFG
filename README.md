@@ -5,7 +5,7 @@
 2. [Requirements](#requirements)
 3. [Installation](#installation)
 4. [Local set up](#local-set-up)
-5. [Tutorial](#tutorial)
+5. [Commands](#Commands)
 
 ## Introduction
 The MongoDB Service module is responsible for storing data on the ground and retrieving it as requested via MQTT. The module right now offers communications between MongoDB and the Controllers Game from Dashboard Games, allowing to save, load and delete scenarios. The data is stored in a MongoDB database.   
