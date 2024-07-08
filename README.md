@@ -31,7 +31,7 @@ As this application goes along with the Mobile App, you must have that app runni
 
 When you enter to this game a screen showing all the game modes is shown and you can choose. Note that only two of the four modes are fully implemented so you can only choose "Fingers" or "Poses". 
 
-<img width="770" alt="Captura de pantalla 2023-07-26 124021" src="https://github.com/MiguelAlvarezFernandez96/TFG/master/assets/Captura/Captura de pantalla 2024-06-03 111726">
+<img width="770" alt="Captura de pantalla 2023-07-26 124021" src="https://github.com/MiguelAlvarezFernandez96/TFG/blob/master/assets/Capturas/Captura%20de%20pantalla%202024-06-03%20111726.png">
 
 Then you enter to the main page where you can choose the device from where to open the camera, the difficulty level and the scenario to play. If you choose the camera of the computer, it will start recording you so you can practice the movements you will do and see how the drone will move. 
 
