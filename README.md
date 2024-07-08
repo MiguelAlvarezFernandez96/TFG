@@ -63,7 +63,7 @@ Command | Description
 --- | --- 
 *getPoligonos* | The module is asking MongoDB service to return a list of scenarios
 *addPoligonos* | The module send a Scenario JSON to add to the database
-*deletePoligonos* | Tells to delete the Scenario that is the same as the one send.
+*deletePoligonos* | Tells to delete the Scenario that is the same as the one sent.
 
 
 Note: getpoligonos makes MongoDB service to send a list of scenarios with the service name *readPoligonos*
